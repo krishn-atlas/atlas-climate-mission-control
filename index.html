@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATLAS Climate Mission Control</title>
+<style>body{background:#081827;color:#e7f4ff;font:16px system-ui;margin:0;padding:20px}main{max-width:900px;margin:auto}h1{font-size:1.5rem}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:#122a42;border:1px solid #285270;border-radius:14px;padding:18px;margin-bottom:12px}.value{font-size:2rem;font-weight:bold}.muted{color:#a4bfd2;font-size:.85rem}button{padding:10px;background:#17618b;color:white;border:0;border-radius:8px}canvas{width:100%;height:220px}</style></head>
+<body><main><p class="muted">KAALI × RK / ATLAS</p><h1>🌧️ Chennai Climate Mission Control</h1><p id="status">Connecting to reference weather service...</p>
+<div class="grid"><div class="card">Temperature<div class="value" id="temp">--</div></div><div class="card">Current rain<div class="value" id="rain">--</div></div><div class="card">Wind<div class="value" id="wind">--</div></div><div class="card">Next 24h rain<div class="value" id="next">--</div></div></div>
+<div class="card"><h3>72-hour rainfall forecast</h3><p class="muted">Reference forecast from Open-Meteo, not an ATLAS model prediction.</p><canvas id="plot" width="800" height="220"></canvas><p class="muted" id="range"></p></div>
+<div class="card"><h3>Mission Control questions</h3><button id="ask">Will it rain in the next 24 hours?</button><p id="reply">Waiting for reference data.</p></div>
+<p class="muted">Prototype v0.1. ATLAS predictions, forecast verification, satellite layers and autonomous chat are not yet connected.</p></main>
+<script>
+let hours=[];const el=id=>document.getElementById(id);
+async function start(){try{
+const u='https://api.open-meteo.com/v1/forecast?latitude=13.12&longitude=80.21&current=temperature_2m,precipitation,wind_speed_10m&hourly=precipitation&forecast_days=4&timezone=Asia%2FKolkata';
+const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();
+el('temp').textContent=d.current.temperature_2m+' °C';el('rain').textContent=d.current.precipitation+' mm';el('wind').textContent=d.current.wind_speed_10m+' km/h';
+const now=d.current.time;hours=d.hourly.time.map((t,i)=>({time:t,rain:d.hourly.precipitation[i]})).filter(x=>x.time>=now).slice(0,72);
+const sum=a=>a.reduce((s,x)=>s+x.rain,0);el('next').textContent=sum(hours.slice(0,24)).toFixed(1)+' mm';
+el('status').textContent='Reference feed connected • '+now.replace('T',' ')+' IST';
+el('range').textContent=hours[0].time+' to '+hours[hours.length-1].time+' IST';
+const c=el('plot'),ctx=c.getContext('2d'),max=Math.max(1,...hours.map(x=>x.rain));ctx.clearRect(0,0,c.width,c.height);
+hours.forEach((x,i)=>{const w=740/hours.length,h=x.rain/max*170;ctx.fillStyle='#55c8f5';ctx.fillRect(42+i*w,190-h,Math.max(2,w-2),h)});
+ctx.fillStyle='#b7d5ea';ctx.font='13px system-ui';ctx.fillText(max.toFixed(1)+' mm/h',4,18);ctx.fillText('0',18,192);
+el('reply').textContent='Reference forecast loaded.';
+}catch(e){el('status').textContent='Feed unavailable: '+e.message}}
+el('ask').onclick=()=>{if(!hours.length)return;const s=hours.slice(0,24).reduce((a,x)=>a+x.rain,0);el('reply').textContent='Reference forecast: '+s.toFixed(1)+' mm rain in the next 24 hours. This is not an ATLAS prediction.'};start();
+</script></body></html>
