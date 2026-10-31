@@ -1,0 +1,14 @@
+{
+  "schema_version": "atlas.shared.public.v1",
+  "mission_id": "CLIMATE-SHARED-001",
+  "status": "awaiting_agent",
+  "updated_at_utc": null,
+  "location": {
+    "name": "Atlantic Ocean",
+    "latitude": 0,
+    "longitude": -30
+  },
+  "message": "Shared mission channel initialized. Agent publishing is not yet connected.",
+  "source": "ATLAS Mission Control prototype",
+  "agent_connected": false
+}
