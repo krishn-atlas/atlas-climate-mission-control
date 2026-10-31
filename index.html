@@ -4,9 +4,9 @@
 <style>body{background:#081827;color:#e7f4ff;font:16px system-ui;margin:0;padding:20px}main{max-width:900px;margin:auto}h1{font-size:1.5rem}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:#122a42;border:1px solid #285270;border-radius:14px;padding:18px;margin-bottom:12px}.value{font-size:2rem;font-weight:bold}.muted{color:#a4bfd2;font-size:.85rem}button{padding:10px;background:#17618b;color:white;border:0;border-radius:8px}canvas{width:100%;height:220px}</style></head>
 <body><main><p class="muted">KAALI × RK / ATLAS</p><h1>🌧️ Chennai Climate Mission Control</h1><p id="status">Connecting to reference weather service...</p>
 <div class="grid"><div class="card">Temperature<div class="value" id="temp">--</div></div><div class="card">Current rain<div class="value" id="rain">--</div></div><div class="card">Wind<div class="value" id="wind">--</div></div><div class="card">Next 24h rain<div class="value" id="next">--</div></div></div>
-<div class="card"><h3>72-hour rainfall forecast</h3><p class="muted">Reference forecast from Open-Meteo, not an ATLAS model prediction.</p><canvas id="plot" width="800" height="220"></canvas><p class="muted" id="range"></p></div>
+<section class="card" aria-labelledby="airport-title"><h2 id="airport-title">Chennai Airport · Observed weather</h2><p id="airport-status" role="status">Loading airport report…</p><div class="grid"><div>Temperature<div class="value" id="airport-temp">—</div></div><div>Wind<div class="value" id="airport-wind">—</div></div><div>Visibility<div class="value" id="airport-vis">—</div></div><div>Pressure · altimeter<div class="value" id="airport-pressure">—</div></div></div><p class="muted" id="airport-time"></p><p class="muted">Airport-local measurement. The forecast above covers a different Chennai location; these are not an accuracy comparison. Visibility is reported in statute miles (sm).</p><details><summary>Source report</summary><p id="airport-raw" style="overflow-wrap:anywhere"></p><a href="https://aviationweather.gov/data/api/" style="color:#55c8f5">NOAA Aviation Weather Center</a></details><button id="airport-refresh" style="margin-top:12px">Refresh airport report</button></section><div class="card"><h3>72-hour rainfall forecast</h3><p class="muted">Reference forecast from Open-Meteo, not an ATLAS model prediction.</p><canvas id="plot" width="800" height="220"></canvas><p class="muted" id="range"></p></div>
 <div class="card"><h3>Mission Control questions</h3><button id="ask">Will it rain in the next 24 hours?</button><p id="reply">Waiting for reference data.</p></div>
-<p class="muted">Prototype v0.1. ATLAS predictions, forecast verification, satellite layers and autonomous chat are not yet connected.</p></main>
+<p class="muted">Prototype v0.2. Airport feed updates hourly when available. ATLAS predictions, forecast verification, satellite layers and autonomous chat are not yet connected.</p></main>
 <script>
 let hours=[];const el=id=>document.getElementById(id);
 async function start(){try{
@@ -23,4 +23,34 @@ ctx.fillStyle='#b7d5ea';ctx.font='13px system-ui';ctx.fillText(max.toFixed(1)+' 
 el('reply').textContent='Reference forecast loaded.';
 }catch(e){el('status').textContent='Feed unavailable: '+e.message}}
 el('ask').onclick=()=>{if(!hours.length)return;const s=hours.slice(0,24).reduce((a,x)=>a+x.rain,0);el('reply').textContent='Reference forecast: '+s.toFixed(1)+' mm rain in the next 24 hours. This is not an ATLAS prediction.'};start();
+
+let airportReport=null,airportFailed=false;
+function airportFreshness(){
+ if(!airportReport)return;
+ const age=(Date.now()-Date.parse(airportReport.observed_at_utc))/60000;
+ const stale=age>120||age< -5;
+ el('airport-status').textContent=(airportFailed?'Refresh failed · showing last loaded report · ':'')+(stale?'STALE / CHECK TIMESTAMP':'Recent observation')+' · '+Math.max(0,Math.round(age))+' minutes old';
+ el('airport-status').style.color=stale||airportFailed?'#ffcd7a':'#86e4c0';
+}
+async function loadAirport(){
+ const button=el('airport-refresh');button.disabled=true;
+ try{
+  const response=await fetch('https://raw.githubusercontent.com/krishn-atlas/atlas-climate-mission-control/main/data/airport.json?t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(15000)});
+  if(!response.ok)throw Error('Feed unavailable');
+  const d=await response.json();
+  if(d.schema_version!=='atlas.airport.public.v1'||d.station!=='VOMM'||!Number.isFinite(Date.parse(d.observed_at_utc)))throw Error('Invalid feed');
+  airportReport=d;airportFailed=false;
+  const value=(x,u)=>typeof x==='number'&&Number.isFinite(x)?x+' '+u:'Not reported';
+  el('airport-temp').textContent=value(d.temperature_c,'°C');
+  el('airport-wind').textContent=value(d.wind_kmh,'km/h');
+  el('airport-pressure').textContent=value(d.altimeter_hpa,'hPa');
+  el('airport-vis').textContent=d.visibility_statute_miles==null?'Not reported':String(d.visibility_statute_miles)+' sm';
+  el('airport-time').textContent='Observed '+new Date(d.observed_at_utc).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+' IST · Hourly collection; source and schedule delays are possible.';
+  el('airport-raw').textContent=d.raw_report;
+  airportFreshness();
+ }catch(e){airportFailed=true;if(airportReport)airportFreshness();else el('airport-status').textContent='Airport feed unavailable or awaiting first publication. Forecast remains separate.';}
+ finally{button.disabled=false;}
+}
+el('airport-refresh').onclick=loadAirport;
+loadAirport();setInterval(loadAirport,300000);setInterval(airportFreshness,60000);
 </script></body></html>

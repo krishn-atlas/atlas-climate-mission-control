@@ -1,0 +1,36 @@
+name: Public airport weather feed
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/publish_airport.py'
+      - 'tests/test_airport.py'
+      - '.github/workflows/airport-feed.yml'
+  schedule:
+    - cron: '17 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: public-airport-feed
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+      - run: python scripts/publish_airport.py
+      - name: Save public weather feed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/airport.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refresh public VOMM weather'
+            git push
+          fi
