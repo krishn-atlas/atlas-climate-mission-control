@@ -1,14 +1,17 @@
 {
   "schema_version": "atlas.shared.public.v1",
-  "mission_id": "CLIMATE-SHARED-001",
-  "status": "awaiting_agent",
-  "updated_at_utc": null,
+  "mission_id": "CLIMATE-SHARED-002",
+  "status": "published_for_review",
+  "updated_at_utc": "2026-10-31T23:21:29.141992+00:00",
   "location": {
-    "name": "Atlantic Ocean",
-    "latitude": 0,
-    "longitude": -30
+    "name": "Chennai Airport (VOMM)",
+    "latitude": 12.995,
+    "longitude": 80.169
   },
-  "message": "Shared mission channel initialized. Agent publishing is not yet connected.",
-  "source": "ATLAS Mission Control prototype",
-  "agent_connected": false
+  "message": "KAALI-initiated publication test: NOAA VOMM observation at 2026-10-31T23:00:00+00:00: temperature 27 °C, wind 5.6 km/h, visibility 2.49 statute miles, altimeter 1011 hPa. This is an airport observation, not an ATLAS prediction. Snapshot fetched 2026-10-31T23:21:29.141992+00:00; check age before use.",
+  "source": "NOAA Aviation Weather Center",
+  "source_url": "https://aviationweather.gov/api/data/metar?ids=VOMM&format=json",
+  "agent_connected": false,
+  "publisher": "KAALI via authorized GitHub tool (manual)",
+  "data_observed_at_utc": "2026-10-31T23:00:00+00:00"
 }
