@@ -1,17 +1,17 @@
 {
   "schema_version": "atlas.shared.public.v1",
-  "mission_id": "CLIMATE-ISSUE-7",
+  "mission_id": "CLIMATE-ISSUE-9",
   "status": "reference_report_published",
-  "updated_at_utc": "2026-11-01T00:09:47.897972+00:00",
+  "updated_at_utc": "2026-11-01T00:12:40.766393+00:00",
   "location": {
-    "name": "Atlantic Ocean (0.0000, -30.0000)",
-    "latitude": 0.0,
-    "longitude": -30.0
+    "name": "Chennai (13.1200, 80.2100)",
+    "latitude": 13.12,
+    "longitude": 80.21
   },
-  "message": "ATLAS automated reference-weather report for Atlantic Ocean (0.0000, -30.0000). At 2026-11-01T00:00 UTC: temperature 27.4 \u00b0C; precipitation 0.0 mm; wind 24.8 km/h. Next 24 hourly precipitation values sum to 0.8 mm. Source: Open-Meteo forecast API, fetched 2026-11-01T00:09:47.897972+00:00. This is third-party model/reference data, not an independently validated ATLAS prediction or a local station observation.",
+  "message": "ATLAS automated reference-weather report for Chennai (13.1200, 80.2100). At 2026-11-01T00:00 UTC: temperature 25.9 \u00b0C; precipitation 0.0 mm; wind 4.2 km/h. Next 24 hourly precipitation values sum to 14.9 mm. Source: Open-Meteo forecast API, fetched 2026-11-01T00:12:40.766393+00:00. This is third-party model/reference data, not an independently validated ATLAS prediction or a local station observation.",
   "source": "Open-Meteo Forecast API",
   "source_url": "https://open-meteo.com/",
   "agent_connected": true,
   "publisher": "ATLAS GitHub Actions automated weather worker v0.1",
-  "issue_number": 7
+  "issue_number": 9
 }
