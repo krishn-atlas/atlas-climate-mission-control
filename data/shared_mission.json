@@ -1,17 +1,17 @@
 {
   "schema_version": "atlas.shared.public.v1",
-  "mission_id": "CLIMATE-SHARED-002",
-  "status": "published_for_review",
-  "updated_at_utc": "2026-10-31T23:21:29.141992+00:00",
+  "mission_id": "CLIMATE-ISSUE-7",
+  "status": "reference_report_published",
+  "updated_at_utc": "2026-11-01T00:09:47.897972+00:00",
   "location": {
-    "name": "Chennai Airport (VOMM)",
-    "latitude": 12.995,
-    "longitude": 80.169
+    "name": "Atlantic Ocean (0.0000, -30.0000)",
+    "latitude": 0.0,
+    "longitude": -30.0
   },
-  "message": "KAALI-initiated publication test: NOAA VOMM observation at 2026-10-31T23:00:00+00:00: temperature 27 °C, wind 5.6 km/h, visibility 2.49 statute miles, altimeter 1011 hPa. This is an airport observation, not an ATLAS prediction. Snapshot fetched 2026-10-31T23:21:29.141992+00:00; check age before use.",
-  "source": "NOAA Aviation Weather Center",
-  "source_url": "https://aviationweather.gov/api/data/metar?ids=VOMM&format=json",
-  "agent_connected": false,
-  "publisher": "KAALI via authorized GitHub tool (manual)",
-  "data_observed_at_utc": "2026-10-31T23:00:00+00:00"
+  "message": "ATLAS automated reference-weather report for Atlantic Ocean (0.0000, -30.0000). At 2026-11-01T00:00 UTC: temperature 27.4 \u00b0C; precipitation 0.0 mm; wind 24.8 km/h. Next 24 hourly precipitation values sum to 0.8 mm. Source: Open-Meteo forecast API, fetched 2026-11-01T00:09:47.897972+00:00. This is third-party model/reference data, not an independently validated ATLAS prediction or a local station observation.",
+  "source": "Open-Meteo Forecast API",
+  "source_url": "https://open-meteo.com/",
+  "agent_connected": true,
+  "publisher": "ATLAS GitHub Actions automated weather worker v0.1",
+  "issue_number": 7
 }
