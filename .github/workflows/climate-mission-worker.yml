@@ -1,0 +1,32 @@
+name: ATLAS Climate Mission Worker
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Existing public ATLAS climate issue number"
+        required: true
+        type: number
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: atlas-shared-mission-publisher
+  cancel-in-progress: false
+jobs:
+  investigate:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.actor == github.repository_owner) ||
+      (github.event_name == 'issues' && github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, 'ATLAS climate investigation: '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Investigate and publish reference report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MISSION_ISSUE_NUMBER: ${{ github.event_name == 'issues' && github.event.issue.number || inputs.issue_number }}
+        run: python3 scripts/climate_mission_worker.py
