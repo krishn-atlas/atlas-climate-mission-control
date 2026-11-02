@@ -234,9 +234,13 @@ async function loadAirport(){
 el('airport-refresh').onclick=loadAirport;
 loadAirport();setInterval(loadAirport,300000);setInterval(airportFreshness,60000);
 </script><script src="https://unpkg.com/globe.gl@2.45.0/dist/globe.gl.min.js"></script>
-<script id="atlas-earth-cv002">
+<script id="atlas-earth-early-diagnostics">
+window.__atlasEarthBoot='script not entered';
+window.addEventListener('error',function(e){if(e.filename&&(/globe|three|atlas-climate/.test(e.filename)||e.message)){window.__atlasEarthLastError=(e.message||'script load error')+' @ '+(e.filename||'page').split('/').pop()+':'+(e.lineno||'?')}});
+window.addEventListener('unhandledrejection',function(e){window.__atlasEarthLastError='Promise: '+String(e.reason&&e.reason.message||e.reason).slice(0,180)});
+</script><script id="atlas-earth-cv002">
 (function(){
-const holder=document.getElementById('earth-globe'),status=document.getElementById('earth-status'),toggle=document.getElementById('earth-mode');
+window.__atlasEarthBoot='globe script entered';const holder=document.getElementById('earth-globe'),status=document.getElementById('earth-status'),toggle=document.getElementById('earth-mode');
 let globe=null,mode='3d';
 const layerButton=document.getElementById('earth-temperature-toggle'),layerStatus=document.getElementById('earth-layer-status'),layerLegend=document.getElementById('earth-temperature-legend');
 const sampleSites=[['Chennai',13.12,80.21],['Atlantic',0,-30],['London',51.51,-0.13],['New York',40.71,-74.01],['Sydney',-33.87,151.21],['Tokyo',35.68,139.69],['Cape Town',-33.93,18.42],['Sao Paulo',-23.55,-46.63],['Nairobi',-1.29,36.82],['Reykjavik',64.15,-21.94],['Singapore',1.35,103.82],['Los Angeles',34.05,-118.24]];
@@ -291,12 +295,12 @@ regionButton.addEventListener('click',toggleRegion);
 function fallback(message){mode='2d';document.body.classList.remove('earth-3d');document.body.classList.add('earth-2d');toggle.textContent='Try 3D Earth';toggle.setAttribute('aria-pressed','false');status.textContent=message;setTimeout(()=>{if(typeof map!=='undefined'&&map)map.invalidateSize()},150)}
 function sync(){if(!globe)return;drawSamples();globe.pointOfView({lat:selected.lat,lng:selected.lon,altitude:2.75},850);status.textContent='Selected: '+selected.name+' ('+selected.lat.toFixed(3)+', '+selected.lon.toFixed(3)+')';}
 try{
-if(!window.Globe)throw Error('3D globe library unavailable');const probe=document.createElement('canvas');const gl=probe.getContext('webgl2')||probe.getContext('webgl');if(!gl)throw Error('WebGL unavailable on this browser');
-globe=Globe()(holder).globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg').backgroundColor('rgba(0,0,0,0)').showAtmosphere(true).atmosphereColor('#5ab8ff').atmosphereAltitude(0.16).pointColor('color').pointAltitude(d=>d.regional?0.009:0.012).pointRadius(d=>d.selected?0.12:d.regional?0.18:0.16).pointLabel(d=>d.selected?'Selected: '+selected.name+' ('+selected.lat.toFixed(3)+', '+selected.lon.toFixed(3)+')':d.name+': '+d.temp.toFixed(1)+' °C (Open-Meteo model sample'+(d.regional?', regional point':'')+')'').onPointClick(d=>{if(d.selected)return;selected={lat:d.lat,lon:d.lng,name:d.name};document.getElementById('region').value='';changeLocation()}).onGlobeClick(({lat,lng})=>{selected={lat,lon:lng,name:'Selected coordinates'};document.getElementById('region').value='';changeLocation()});
+window.__atlasEarthBoot='checking globe library';if(!window.Globe)throw Error('3D globe library unavailable');const probe=document.createElement('canvas');const gl=probe.getContext('webgl2')||probe.getContext('webgl');if(!gl)throw Error('WebGL unavailable on this browser');
+window.__atlasEarthBoot='creating WebGL globe';globe=Globe()(holder).globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg').backgroundColor('rgba(0,0,0,0)').showAtmosphere(true).atmosphereColor('#5ab8ff').atmosphereAltitude(0.16).pointColor('color').pointAltitude(d=>d.regional?0.009:0.012).pointRadius(d=>d.selected?0.12:d.regional?0.18:0.16).pointLabel(d=>d.selected?'Selected: '+selected.name+' ('+selected.lat.toFixed(3)+', '+selected.lon.toFixed(3)+')':d.name+': '+d.temp.toFixed(1)+' °C (Open-Meteo model sample'+(d.regional?', regional point':'')+')'').onPointClick(d=>{if(d.selected)return;selected={lat:d.lat,lon:d.lng,name:d.name};document.getElementById('region').value='';changeLocation()}).onGlobeClick(({lat,lng})=>{selected={lat,lon:lng,name:'Selected coordinates'};document.getElementById('region').value='';changeLocation()});
 function resize(){if(globe&&mode==='3d')globe.width(holder.clientWidth).height(holder.clientHeight)}
 resize();window.addEventListener('resize',resize);
 const originalChange=changeLocation;changeLocation=function(){originalChange();sync()};
-document.body.classList.add('earth-3d');sync();
+document.body.classList.add('earth-3d');window.__atlasEarthBoot='globe configured';sync();
 toggle.addEventListener('click',()=>{if(mode==='3d'){fallback('2D map active. Tap the map to select coordinates.')}else{mode='3d';document.body.classList.remove('earth-2d');document.body.classList.add('earth-3d');toggle.textContent='Switch to 2D map';toggle.setAttribute('aria-pressed','true');resize();sync()}});
 }catch(error){fallback('3D Earth unavailable: '+(error&&error.message?error.message:'unknown initialization error')+'. Use the 2D map.');window.__atlasGlobeError=String(error&&error.stack||error);toggle.disabled=true}
 })();
@@ -386,7 +390,7 @@ if(!node||!status)return;
 setTimeout(()=>{
 const canvas=node.querySelector('canvas');
 if(!canvas||canvas.width===0||canvas.height===0){
-if(!status.textContent.includes('unavailable:'))status.textContent='⚠ 3D Earth did not initialize (canvas missing or zero-size). Use the 2D map or reload.';
+const stage=window.__atlasEarthBoot||'unknown',error=window.__atlasEarthLastError||window.__atlasGlobeError||'none captured';status.textContent='⚠ 3D diagnostic: '+stage+' · '+(canvas?'canvas '+canvas.width+'×'+canvas.height:'no canvas')+' · error: '+String(error).slice(0,190)+'. Use 2D map.';
 return;
 }
 if(node.clientWidth<100||node.clientHeight<100){status.textContent='⚠ Earth viewport is too small. Rotate your phone or reload.';return}
