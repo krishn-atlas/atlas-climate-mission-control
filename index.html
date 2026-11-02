@@ -30,8 +30,8 @@ button:active{transform:scale(.985)}
 #earth-globe canvas{width:auto;height:auto}
 #earth-status{min-height:1.3em}
 #earth-mode{font-size:.85rem;background:#173d59;border:1px solid #4c8297}
-body.earth-3d #map{display:none}
-body.earth-3d #mapstatus{display:none}
+body.earth-3d #map{display:block}
+body.earth-3d #mapstatus{display:block}
 body.earth-2d #earth-globe{display:none}
 @media(max-width:600px){#earth-globe{height:360px;min-height:320px}}
 </style><style id="atlas-cv003">
@@ -450,9 +450,11 @@ button.addEventListener('click',()=>{
 enabled=!enabled;button.setAttribute('aria-pressed',String(enabled));
 button.textContent=enabled?'🛰 Hide NASA satellite image':'🛰 Show NASA satellite image';
 if(enabled)update();else{revision++;if(layer){map.removeLayer(layer);layer=null}status.textContent='Satellite layer off · NASA GIBS daily true-color imagery'}
-map.invalidateSize();
+requestAnimationFrame(()=>map.invalidateSize());
 });
 days.addEventListener('change',()=>{if(enabled)update();else status.textContent='Selected '+chosenDate()+' UTC. Enable the layer to load imagery.'});
+const geoMapNode=document.getElementById('map');if(window.ResizeObserver&&geoMapNode){new ResizeObserver(()=>{if(geoMapNode.offsetWidth&&geoMapNode.offsetHeight)map.invalidateSize()}).observe(geoMapNode)}
+requestAnimationFrame(()=>map.invalidateSize());
 opacity.addEventListener('input',()=>{opacityLabel.textContent=opacity.value+'%';if(layer)layer.setOpacity(Number(opacity.value)/100)});
 })();
 </script><script id="atlas-globe-health">
