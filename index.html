@@ -324,31 +324,31 @@ const atlasSatButton=document.getElementById('atlas-globe-satellite');
 const atlasSatDate=document.getElementById('atlas-globe-date');
 const atlasSatStatus=document.getElementById('atlas-globe-satellite-status');
 const atlasBlueMarble='https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
-let atlasSatEnabled=false,atlasSatRequest=0;
+let atlasSatEnabled=false,atlasSatRequest=0,atlasSatTimer=null;
 function atlasObservationDate(){return new Date(Date.now()-Number(atlasSatDate.value)*86400000).toISOString().slice(0,10)}
 function atlasSatelliteOff(){
-  atlasSatRequest++;atlasSatEnabled=false;
+  atlasSatRequest++;atlasSatEnabled=false;if(atlasSatTimer){clearTimeout(atlasSatTimer);atlasSatTimer=null}
   atlasSatButton.setAttribute('aria-pressed','false');atlasSatButton.textContent='Show NASA imagery on globe';
   globe.globeImageUrl(atlasBlueMarble);
   atlasSatStatus.textContent='Blue Marble restored. NASA satellite layer off.';
 }
 function atlasSatelliteLoad(){
   if(!atlasSatEnabled)return;
-  const request=++atlasSatRequest,date=atlasObservationDate();
+  const request=++atlasSatRequest,date=atlasObservationDate();if(atlasSatTimer){clearTimeout(atlasSatTimer);atlasSatTimer=null}
   atlasSatButton.disabled=true;
   atlasSatStatus.textContent='Requesting NASA VIIRS daily true-color image for '+date+' UTC…';
   const qs=new URLSearchParams({SERVICE:'WMS',REQUEST:'GetMap',VERSION:'1.1.1',LAYERS:'VIIRS_SNPP_CorrectedReflectance_TrueColor',STYLES:'',FORMAT:'image/jpeg',SRS:'EPSG:4326',BBOX:'-180,-90,180,90',WIDTH:'2048',HEIGHT:'1024',TIME:date});
   const url='https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?'+qs.toString();
   const testImage=new Image();
-  const timeout=setTimeout(()=>{if(request!==atlasSatRequest)return;testImage.onload=null;testImage.onerror=null;atlasSatButton.disabled=false;atlasSatStatus.textContent='NASA image request timed out. Blue Marble retained. Try an older observation date.'},18000);
+  atlasSatTimer=setTimeout(()=>{if(request!==atlasSatRequest)return;atlasSatRequest++;testImage.onload=null;testImage.onerror=null;atlasSatButton.disabled=false;atlasSatStatus.textContent='NASA image request timed out. Blue Marble retained. Try an older observation date.'},18000);
   testImage.onload=()=>{
-    clearTimeout(timeout);if(request!==atlasSatRequest||!atlasSatEnabled)return;
-    if(testImage.naturalWidth<512){atlasSatStatus.textContent='NASA returned an unexpected image. Blue Marble retained.';atlasSatButton.disabled=false;return}
+    if(atlasSatTimer){clearTimeout(atlasSatTimer);atlasSatTimer=null}if(request!==atlasSatRequest||!atlasSatEnabled)return;
+    if(testImage.naturalWidth<512||testImage.naturalHeight<256){atlasSatStatus.textContent='NASA returned an unexpected image. Blue Marble retained.';atlasSatButton.disabled=false;return}
     globe.globeImageUrl(url);atlasSatButton.disabled=false;
     atlasSatStatus.textContent='NASA GIBS / VIIRS S-NPP true color · '+date+' UTC. Historical daily satellite imagery, not live cloud/radar data. Some coverage may be missing.';
   };
   testImage.onerror=()=>{
-    clearTimeout(timeout);if(request!==atlasSatRequest)return;
+    if(atlasSatTimer){clearTimeout(atlasSatTimer);atlasSatTimer=null}if(request!==atlasSatRequest)return;
     atlasSatButton.disabled=false;atlasSatStatus.textContent='NASA imagery unavailable for '+date+'. Blue Marble retained; try another date.';
   };
   testImage.src=url;
