@@ -296,7 +296,19 @@ function fallback(message){mode='2d';document.body.classList.remove('earth-3d');
 function sync(){if(!globe)return;drawSamples();globe.pointOfView({lat:selected.lat,lng:selected.lon,altitude:2.75},850);status.textContent='Selected: '+selected.name+' ('+selected.lat.toFixed(3)+', '+selected.lon.toFixed(3)+')';}
 try{
 window.__atlasEarthBoot='checking globe library';if(!window.Globe)throw Error('3D globe library unavailable');const probe=document.createElement('canvas');const gl=probe.getContext('webgl2')||probe.getContext('webgl');if(!gl)throw Error('WebGL unavailable on this browser');
-window.__atlasEarthBoot='creating WebGL globe';globe=Globe()(holder).globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg').backgroundColor('rgba(0,0,0,0)').showAtmosphere(true).atmosphereColor('#5ab8ff').atmosphereAltitude(0.16).pointColor('color').pointAltitude(d=>d.regional?0.009:0.012).pointRadius(d=>d.selected?0.12:d.regional?0.18:0.16).pointLabel(d=>d.selected?'Selected: '+selected.name+' ('+selected.lat.toFixed(3)+', '+selected.lon.toFixed(3)+')':d.name+': '+d.temp.toFixed(1)+' °C (Open-Meteo model sample'+(d.regional?', regional point':'')+')'').onPointClick(d=>{if(d.selected)return;selected={lat:d.lat,lon:d.lng,name:d.name};document.getElementById('region').value='';changeLocation()}).onGlobeClick(({lat,lng})=>{selected={lat,lon:lng,name:'Selected coordinates'};document.getElementById('region').value='';changeLocation()});
+window.__atlasEarthBoot='creating WebGL globe';
+globe=Globe()(holder)
+ .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+ .backgroundColor('rgba(0,0,0,0)')
+ .showAtmosphere(true)
+ .atmosphereColor('#5ab8ff')
+ .atmosphereAltitude(0.16)
+ .pointColor('color')
+ .pointAltitude(d=>d.regional?0.009:0.012)
+ .pointRadius(d=>d.selected?0.12:d.regional?0.18:0.16)
+ .pointLabel(d=>d.selected?'Selected location':(d.name+': '+(typeof d.temp==='number'?d.temp.toFixed(1)+' °C':'model sample')))
+ .onPointClick(d=>{if(d.selected)return;selected={lat:d.lat,lon:d.lng,name:d.name};document.getElementById('region').value='';changeLocation()})
+ .onGlobeClick(({lat,lng})=>{selected={lat,lon:lng,name:'Selected coordinates'};document.getElementById('region').value='';changeLocation()});
 function resize(){if(globe&&mode==='3d')globe.width(holder.clientWidth).height(holder.clientHeight)}
 resize();window.addEventListener('resize',resize);
 const originalChange=changeLocation;changeLocation=function(){originalChange();sync()};
