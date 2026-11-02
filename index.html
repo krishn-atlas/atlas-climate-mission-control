@@ -298,7 +298,7 @@ resize();window.addEventListener('resize',resize);
 const originalChange=changeLocation;changeLocation=function(){originalChange();sync()};
 document.body.classList.add('earth-3d');sync();
 toggle.addEventListener('click',()=>{if(mode==='3d'){fallback('2D map active. Tap the map to select coordinates.')}else{mode='3d';document.body.classList.remove('earth-2d');document.body.classList.add('earth-3d');toggle.textContent='Switch to 2D map';toggle.setAttribute('aria-pressed','true');resize();sync()}});
-}catch(error){fallback('3D Earth unavailable: '+(error&&error.message?error.message:'unknown initialization error')+'. Use the 2D map.');toggle.disabled=true}
+}catch(error){fallback('3D Earth unavailable: '+(error&&error.message?error.message:'unknown initialization error')+'. Use the 2D map.');window.__atlasGlobeError=String(error&&error.stack||error);toggle.disabled=true}
 })();
 </script><script id="atlas-rain-watch-feed">
 (async function(){
@@ -386,7 +386,7 @@ if(!node||!status)return;
 setTimeout(()=>{
 const canvas=node.querySelector('canvas');
 if(!canvas||canvas.width===0||canvas.height===0){
-status.textContent='⚠ 3D Earth did not initialize. Try Switch to 2D map or reload the page.';
+if(!status.textContent.includes('unavailable:'))status.textContent='⚠ 3D Earth did not initialize (canvas missing or zero-size). Use the 2D map or reload.';
 return;
 }
 if(node.clientWidth<100||node.clientHeight<100){status.textContent='⚠ Earth viewport is too small. Rotate your phone or reload.';return}
@@ -415,6 +415,6 @@ setTimeout(()=>fallbackMap.invalidateSize(),150);
 button.addEventListener('click',()=>{if(document.body.classList.contains('earth-2d')){location.reload()}else showMap()});
 const oldChange=typeof changeLocation==='function'?changeLocation:null;
 if(oldChange)changeLocation=function(){oldChange();if(fallbackMap&&document.body.classList.contains('earth-2d')){fallbackMap.panTo([selected.lat,selected.lon]);fallbackPin.setLatLng([selected.lat,selected.lon])}};
-setTimeout(()=>{if(!document.body.classList.contains('earth-3d'))return;const canvas=holder.querySelector('canvas');if(!canvas||canvas.width===0||canvas.height===0)showMap()},5500);
+setTimeout(()=>{if(!document.body.classList.contains('earth-3d'))return;const canvas=holder.querySelector('canvas');if(!canvas||canvas.width===0||canvas.height===0){showMap();status.textContent=window.__atlasGlobeError?'3D renderer error: '+window.__atlasGlobeError.slice(0,240)+' · 2D map activated.':'3D initialization failed; interactive 2D map activated automatically.'}},5500);
 })();
 </script></body></html>
