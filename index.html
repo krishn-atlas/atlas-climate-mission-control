@@ -538,7 +538,7 @@ if(!data||!data.daily||!Array.isArray(data.daily.time))return 'Historical data u
 const idx=data.daily.time.indexOf(date);
 if(idx<0)return 'No historical data returned for this date.';
 const fmt=(key,unit)=>{const n=data.daily[key]&&data.daily[key][idx];return typeof n==='number'&&Number.isFinite(n)?n.toFixed(1)+' '+unit:'Unavailable'};
-return 'Mean temperature: '+fmt('temperature_2m_mean','°C')+'\\nRainfall total: '+fmt('precipitation_sum','mm')+'\\nMaximum wind speed: '+fmt('wind_speed_10m_max','km/h');
+return 'Mean temperature: '+fmt('temperature_2m_mean','°C')+'\nRainfall total: '+fmt('precipitation_sum','mm')+'\nMaximum wind speed: '+fmt('wind_speed_10m_max','km/h');
 }
 async function loadHistory(){
 if(!active)return;
