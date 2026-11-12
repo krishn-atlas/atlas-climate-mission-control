@@ -1,14 +1,14 @@
 {
   "schema_version": "atlas.public.rain_watch.v1",
   "type": "independently_collected_public_reference_forecast",
-  "fetched_at_utc": "2026-11-12T00:30:55.705576+00:00",
+  "fetched_at_utc": "2026-11-12T07:38:41.163277+00:00",
   "location": {
     "name": "Chennai reference grid",
     "latitude": 13.12,
     "longitude": 80.21
   },
   "source": "Open-Meteo Forecast API",
-  "forecast_valid_from_utc": "2026-11-12T00:30Z",
+  "forecast_valid_from_utc": "2026-11-12T07:30Z",
   "next_24h_forecast_rain_mm": 1.5,
   "forecast_hours": 24,
   "current_reference_precipitation_mm": 0.0,
