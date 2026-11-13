@@ -1,15 +1,15 @@
 {
   "schema_version": "atlas.public.rain_watch.v1",
   "type": "independently_collected_public_reference_forecast",
-  "fetched_at_utc": "2026-11-12T16:12:53.695749+00:00",
+  "fetched_at_utc": "2026-11-13T02:52:42.673879+00:00",
   "location": {
     "name": "Chennai reference grid",
     "latitude": 13.12,
     "longitude": 80.21
   },
   "source": "Open-Meteo Forecast API",
-  "forecast_valid_from_utc": "2026-11-12T16:00Z",
-  "next_24h_forecast_rain_mm": 0.9,
+  "forecast_valid_from_utc": "2026-11-13T02:45Z",
+  "next_24h_forecast_rain_mm": 2.3,
   "forecast_hours": 24,
   "current_reference_precipitation_mm": 0.0,
   "limitations": "Public feed collected separately from private CL-004. Forecast, not observed Padi rainfall or ATLAS model prediction."
