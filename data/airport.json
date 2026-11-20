@@ -4,12 +4,12 @@
   "station_name": "Chennai Airport",
   "source": "NOAA Aviation Weather Center",
   "source_url": "https://aviationweather.gov/api/data/metar?ids=VOMM&format=json",
-  "observed_at_utc": "2026-11-19T21:00:00+00:00",
-  "fetched_at_utc": "2026-11-19T21:28:26.061718+00:00",
-  "temperature_c": 25,
+  "observed_at_utc": "2026-11-20T03:00:00+00:00",
+  "fetched_at_utc": "2026-11-20T03:08:43.728692+00:00",
+  "temperature_c": 26,
   "wind_kmh": 7.4,
-  "visibility_statute_miles": 1.86,
-  "altimeter_hpa": 1011,
-  "raw_report": "METAR VOMM 192100Z 26004KT 3000 BR SCT020 SCT100 25/22 Q1011 NOSIG",
+  "visibility_statute_miles": 1.24,
+  "altimeter_hpa": 1014,
+  "raw_report": "METAR VOMM 200300Z 29004KT 2000 BR FEW020 26/23 Q1014 BECMG 3000 BR",
   "note": "Airport-local observation, not citywide ground truth. No rainfall total or forecast accuracy inferred."
 }
